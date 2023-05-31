@@ -5,10 +5,9 @@ Repositorio de prueba 1 para el Taller de programación en R para Análisis de D
 En este curso aprendemos los fundamentos de la programación en R y cómo aplicarlos al análisis y visualización de datos.
 
 **Contenido del curso** 
+
 |Contenido | duración aproximada |
-
-| :----------:| :-----------------:|
-
+| :----------:| :------------:|
 | Git, github, trabajo colaborativo y herramientas para la gestión de versiones de código |           3 semanas |
 |:------------------------------------|----------------------------------:|
 | Preparación de datos para el análisis en R                                              |           4 semanas |

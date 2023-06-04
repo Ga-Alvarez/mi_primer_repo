@@ -1,0 +1,18 @@
+---
+title: "Practica 2"
+author: "Ana Gabriela Álvarez Ruiz"
+date: "2023-06-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(datasets)
+```
+
+
+```{r}
+autos <- datasets::mtcars
+```
+

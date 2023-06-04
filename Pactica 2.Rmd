@@ -4,15 +4,42 @@ author: "Ana Gabriela Álvarez Ruiz"
 date: "2023-06-04"
 output: html_document
 ---
-
+1. Cree un tiquete en su repositorio que diga “Resolver ejercicio con mtcars”.
+2. Cree una rama respectiva en su RStudio para resolver esta tarea.
+3. Cree un Rmarkdown y cargue las librerías datasets y dplyr.
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(datasets)
 ```
 
-
+4. Cree un objeto de R donde llame el conjunto de datos mtcars de la librería datasets.
 ```{r}
 autos <- datasets::mtcars
+```
+
+5. Filtre el objeto autos para obtener solo los automóviles que tienen más de 100 caballos de fuerza (hp).
+```{r}
+autos_filtrada <- autos|>
+  filter(hp> 100)
+```
+
+6. Ordene dichos automóviles de forma descendente según la potencia (hp).
+```{r}
+autos_filtrada |> 
+  arrange(desc(hp))
+```
+7. Seleccione únicamente las columnas mpg, hp y wt.
+```{r}
+autos_seleccion <- autos_filtrada|> 
+  select(mpg,hp,wt)
+```
+
+8. Calcule el promedio de las millas por galón (mpg), la potencia (hp) y el peso (wt) para este conjunto
+de datos.
+```{r}
+
+autos_seleccion |> 
+mean(hp)
 ```
 

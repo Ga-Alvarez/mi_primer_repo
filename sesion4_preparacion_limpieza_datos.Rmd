@@ -307,14 +307,49 @@ datos_hospital <- read_csv2("https://raw.githubusercontent.com/isa229/programaci
 
 2. Determine si hay filas duplicadas. En el caso de que haya, cuántas y cuáles son?
 
+```{r}
+filas_duplicadas_hospital<- datos_hospital |>  
+  janitor::get_dupes() |> 
+distinct()
+```
+
 3. Elimine las filas y columnas vacías (si hay). Cuántas filas vacías eliminó? Eliminó 
 alguna columna?
+Eliminó 6 filas y 1 columna
+
+```{r}
+datos_sin_vacio_hospital <- datos_hospital |> 
+  remove_empty(which = c("rows", "cols")) 
+```
+
 
 4. Para las columnas chills, cough, aches, vomit coloque "Sin información"
 en donde haya NAs, además donde diga "Yes", cámbielo por "Sí"
 
+```{r}
+datos_hospital_reemplazo <- datos_sin_vacio_hospital |> 
+  mutate(chills = replace_na(chills, "Sin información"),
+         cough = replace_na(cough, "Sin información"),
+         aches = replace_na(aches, "sin información"),
+         vomit = replace_na(vomit, "sin información")) |> 
+  mutate(chills = case_when(chills == "Y" ~ "Yes",
+                                  TRUE ~ chills,
+                            cough == "Y" ~ "Yes",
+                                  TRUE ~ cough,
+                            aches == "Y" ~ "Yes",
+                                  TRUE ~ aches,
+                            vomit == "Y" ~ "Yes",
+                                  TRUE ~ vomit))
+```
+
+
 5. Cree una nueva columna llamada tiene_fiebre que se calcule de la siguiente manera:
 Si la temperatura es mayor o igual que 37, diga "Si", pero si la temperatura es menor a 37, diga "No".
+
+```{r}
+
+```
+
 
 6. Revise el conjunto de datos e implemente otras estrategias de limpieza y preparación
 de datos que le parezcan relevantes para este conjunto de datos.

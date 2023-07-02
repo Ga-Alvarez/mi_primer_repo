@@ -267,7 +267,7 @@ airquality_temp_altas
 ```
 
 ```{r}
-airquality_gt <- airquality_temp_altas|> 
+airquality_gt <- airquality_temp_altas|>  
   gt()
 
 airquality_gt
@@ -277,7 +277,7 @@ c. Agregue títulos, subtítulos, fuente y pie de tabla al cuadro obtenido. Recu
 usar ?airquality para obtener información sobre el origen de los datos.
 
 ```{r}
-airquality_gt|> 
+airquality_gt <-airquality_gt|> 
    tab_header(
     title = "Calidad del aire en New York",
     subtitle = "Se presentan las 10 Temperatura más altas correspondientes al año 1973" 
@@ -287,17 +287,48 @@ airquality_gt|>
   ) |> 
   tab_source_note(
     source_note = "Chambers, J. M., Cleveland, W. S., Kleiner, B. and Tukey, P. A. (1983) Graphical Methods for Data Analysis. Belmont, CA: Wadsworth."
-  )
-```
-
-```{r}
-
+  ) |> 
+  tab_footnote(
+    footnote = "Mes con más temperaturas altas del top 10", 
+    locations = cells_body(columns = Month, rows = 1:4))
 ```
 
 
 d. Además, agrupelas columnas Ozone, Solar.R y Wind bajo un tab_spanner llamada "Mediciones", 
 y las columnas Temp, Month y Day bajo un tab_spanner llamado "Tiempo".
 
+```{r}
+airquality_gt <-airquality_gt|> 
+  tab_spanner(
+    label = "Mediciones",
+    columns = c(Ozone, Solar.R,Wind)
+  ) |>
+  tab_spanner(
+    label = "Tiempo",
+    columns = c(Temp, Month, Day)
+  )
+
+airquality_gt
+```
+
 e. Renombre las columnas para que estén en español y coloque colores a su gusto a 
 la columna Temperatura.
+
+```{r}
+airquality_gt <- airquality_gt |> 
+  cols_label(
+    Ozone = "Ozono",
+    Solar.R = "Radiacion Solar",
+    Wind = "Viento",
+    Temp = "Temperatura",
+    Month = "Mes",
+    Day = "Dia"
+  )
+
+airquality_gt
+```
+
+```{r}
+gtsave(airquality_gt,"arquality.png")
+```
 

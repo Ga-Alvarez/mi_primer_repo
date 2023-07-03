@@ -17,9 +17,112 @@ library(janitor) #limpieza de datos
 library(lubridate) #manejo de fechas
 ```
 
+## Primera Parte:
+
 1.Carga de datos:
 
 ```{r}
 datos_netflix <- read_csv2("https://raw.githubusercontent.com/isa229/programacion_analisis_datos_ii/main/netflix_info.csv")
 ```
 
+2. Ajustar nombres de las columnas en español:
+
+```{r}
+datos_netflix<- datos_netflix |> 
+  rename("tipo"= "type",
+         "titulo"="title",
+         "pais"="country",
+         "fecha_agregada"="date_added",
+         "año_lanzamiento"="release_year",
+         "clasificacion"="rating",
+         "duracion"="duration",
+         "listado_en"="listed_in")
+```
+
+3. Eliminar filas duplicadas:
+```{r}
+filas_duplicadas <- datos_netflix |>  
+  janitor::get_dupes()
+
+datos_sin_duplicados<- datos_netflix |> 
+  distinct()
+```
+
+4. Elimine filas y columnas vacias:
+```{r}
+datos_sin_vacios <- datos_sin_duplicados|> 
+  remove_empty(which = c("rows", "cols"))
+```
+
+5. Elimine la variable correspondiente al año de lanzamiento
+```{r}
+datos_sin_año<- datos_sin_vacios |> 
+  select(-año_lanzamiento)
+```
+
+6. Hacer una inspección de las variables type y country para determinar si hay observaciones mal escritas. Hacer la limpieza para poder homogenizar esos datos.
+```{r}
+datos_examinados<- datos_sin_año |> 
+  distinct(tipo,pais)
+```
+
+```{r}
+datos_limpios <- datos_sin_año |> 
+  mutate(pais = case_when(pais == "india" ~ "India",
+                          pais == "united states" ~ "United States",
+                          pais == "pakistan" ~ "Pakistan",
+                                        TRUE ~ pais )) |> 
+        mutate(tipo = case_when(tipo == "tv show"~ "TV Show",
+                          tipo == "movie" ~ "Movie",
+                          tipo == "Movi" ~ "Movie",
+                         TRUE ~ tipo ))
+
+   datos_examinados<- datos_limpios |> 
+  distinct(tipo,pais)                                    
+```
+
+7. Para todas las columnas de tipo caracter en donde hay NA, coloque sin información
+```{r}
+datos_limpios<- datos_limpios|> 
+  mutate_at(vars(director,pais), ~ifelse(is.na(.), "Sin información", .))
+```
+
+8. Añada una columna llamada anyo que indique el año en que el show o pelicula fue añadida a NEtflix. Añada también una columa llamada mes que indique el mes en que el show o pelicula fue añadido.
+Paso columna fecha a formato date:
+```{r}
+datos_limpios <- datos_limpios |> 
+  mutate(fecha_agregada= mdy(fecha_agregada))
+
+```
+agrego columna anyo:
+```{r}
+datos_limpios <- datos_limpios |> 
+   mutate(anyo = year(fecha_agregada))
+  
+```
+agrego columna mes:
+```{r}
+datos_limpios <- datos_limpios |> 
+  mutate(mes = month(fecha_agregada))
+```
+
+Reacomodo columnas:
+```{r}
+datos_limpios<- datos_limpios |> 
+  relocate(show_id, 
+           tipo,
+           titulo,director,
+           pais,
+           fecha_agregada,
+           mes,anyo)
+```
+
+##Segunda Parte:
+Responda las siguientes preguntas:
+1. Cuántas películas y shows de TV hay por país?
+
+2. Cuáles son los 10 directores con mayor cantidad de películas(sin contar shows de TV) en Netflix? Ordenelos por orden descendente.
+
+3.Cuáles son las 10 directores con mayor cantidad de shows de TV (sin contar películas) en Netflix? Ordenelos por orden descendete.
+
+4. Obtenga la lista de películas y shows de TV que se añadieron en marzo del 2020. ¿Cuáles fueron?

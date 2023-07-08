@@ -84,22 +84,24 @@ datos_limpios <- datos_sin_año |>
 7. Para todas las columnas de tipo caracter en donde hay NA, coloque sin información
 ```{r}
 datos_limpios<- datos_limpios|> 
-  mutate_at(vars(director,pais), ~ifelse(is.na(.), "Sin información", .))
+   mutate(across(where(is.character), function(x) ifelse(is.na(x), "Sin información", x)))
 ```
 
-8. Añada una columna llamada anyo que indique el año en que el show o pelicula fue añadida a NEtflix. Añada también una columa llamada mes que indique el mes en que el show o pelicula fue añadido.
-Paso columna fecha a formato date:
+8. Añada una columna llamada anyo que indique el año en que el show o pelicula fue añadida a NEtflix. Añada también una columna llamada mes que indique el mes en que el show o pelicula fue añadido.
+Paso 1:columna fecha a formato date:
 ```{r}
 datos_limpios <- datos_limpios |> 
   mutate(fecha_agregada= mdy(fecha_agregada))
 
 ```
+
 agrego columna anyo:
 ```{r}
 datos_limpios <- datos_limpios |> 
    mutate(anyo = year(fecha_agregada))
   
 ```
+
 agrego columna mes:
 ```{r}
 datos_limpios <- datos_limpios |> 
@@ -120,9 +122,54 @@ datos_limpios<- datos_limpios |>
 ##Segunda Parte:
 Responda las siguientes preguntas:
 1. Cuántas películas y shows de TV hay por país?
+```{r}
+shows_movies<-datos_limpios |> 
+  group_by(pais) |> 
+ count(tipo)
+
+```
 
 2. Cuáles son los 10 directores con mayor cantidad de películas(sin contar shows de TV) en Netflix? Ordenelos por orden descendente.
+```{r}
+filtro<- datos_limpios |> 
+ filter(tipo == "Movie")
+
+directores_mas_peliculas<- filtro |> 
+  group_by(director) |> 
+  count(tipo)
+
+ordenado<-directores_mas_peliculas |> 
+  arrange(desc(n))
+```
+
+Los 10 directores con mayor cantidad de peliculas en Netflix son:
+Rajiv Chilaka con 19,Ra�l Campos, Jan Suter con 18, Suhas Kadav con 16, Marcus Raboy con 15, Jay Karas con 14, Cathy Garcia-Molina con 13,Jay Chapman con 12, Martin Scorsese con 12, Youssef Chahine con 12 y Steven Spielberg con 11 peliculas.
 
 3.Cuáles son las 10 directores con mayor cantidad de shows de TV (sin contar películas) en Netflix? Ordenelos por orden descendete.
+```{r}
+filtro_show<- datos_limpios |> 
+ filter(tipo == "TV Show") 
+ 
+
+directores_mas_TVshow<- filtro_show|> 
+  group_by(director) |> 
+  count(tipo)
+
+ordenado_show<-directores_mas_TVshow |> 
+  arrange(desc(n))
+```
+Los 10 directores con mayor cantidad de TV shows son: 
+Alastair Fothergill con 14, Mark Thornton, Todd Kauffman con 5, Stan Lathan con 3, Hsu Fu-chuncon 2, Iginio Straffi con 2,Ken Burns con 2, Rob Seidenglanz con 2, Shin Won-ho con 2, Adrien Lagier, Ousmane Ly con 1, Adri�n Garc�a Bogliano con 1
 
 4. Obtenga la lista de películas y shows de TV que se añadieron en marzo del 2020. ¿Cuáles fueron?
+```{r}
+marzo_2020<- datos_limpios |> 
+  filter (anyo == 2020 & mes == 3)
+```
+
+Esta es la lista de peliculas y tv shows que se añadieron en marzo del 2020:
+```{r}
+marzo_2020<- marzo_2020 |> 
+  select(titulo,tipo)
+```
+

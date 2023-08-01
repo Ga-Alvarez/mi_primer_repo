@@ -19,6 +19,7 @@ library(utils)
 library(leaflet)
 library(janitor)
 library(stringr)
+library(gt)
 ```
 
 
@@ -30,14 +31,48 @@ datos_AQI <- read.csv("https://raw.githubusercontent.com/isa229/programacion_ana
 b. Cuántas categorías diferentes de AQI (AQI Category) hay en este conjunto de datos? Cuáles son?
 (2pts)
 ```{r}
+datos_AQI<-datos_AQI |> 
+ clean_names()
 
+datos_AQI |> 
+distinct(aqi_category) 
+ 
 ```
 
 c. Cree una tabla que indique la cantidad de ciudades que hay en cada categoría de AQI (AQI Category).
 Adicionalmente, traduzca las categorías a español, por ejemplo “Good” sería “Bueno”. Presente esta
 tabla con el paquete gt, añadiendo títulos y subtítulos (10pts).
 ```{r}
+datos_AQI<- datos_AQI |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "Good", "Bueno", x))) |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "Hazardous", "Peligroso", x))) |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "Moderate", "Moderado", x))) |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "Unhealthy", "Insalubre", x))) |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "Unhealthy for Sensitive Groups", "Poco salubdable para grupos sensibles", x))) |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "very Unhealthy", "Muy insalubre", x))) 
 
+datos_AQI
+```
+
+
+```{r}
+datos_aqi<- datos_AQI |> 
+  group_by(aqi_category) |> 
+  summarise(city= n())
+
+aqi_gt<- datos_aqi |> 
+  gt() |> 
+   tab_header(
+    title = "Cantidad de ciudades en cada categoría AQI",
+    subtitle = "Se presenta las categorias del indice de calidad de aire" 
+  ) |> 
+  cols_label(
+    aqi_category = "Categoria(AQI)",
+    city = "Ciudad(n)"
+  )
+
+aqi_gt
+  
 ```
 
 d. Obtenga el promedio del AQI Value por país, y cree 2 tablas: Una que muestre los 10 países con los

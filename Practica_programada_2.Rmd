@@ -9,7 +9,8 @@ editor_options:
 a. Cree un archivo Rmarkdown para resolver esta práctica programada. En el chunk de setup cargue las
 librerías que considere necesarias para resolver la práctica.
 
-```{r}{r setup, include=FALSE}
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(stringr)
@@ -48,8 +49,8 @@ datos_AQI<- datos_AQI |>
   mutate(across(aqi_category, function(x) ifelse(x == "Hazardous", "Peligroso", x))) |> 
   mutate(across(aqi_category, function(x) ifelse(x == "Moderate", "Moderado", x))) |> 
   mutate(across(aqi_category, function(x) ifelse(x == "Unhealthy", "Insalubre", x))) |> 
-  mutate(across(aqi_category, function(x) ifelse(x == "Unhealthy for Sensitive Groups", "Poco salubdable para grupos sensibles", x))) |> 
-  mutate(across(aqi_category, function(x) ifelse(x == "very Unhealthy", "Muy insalubre", x))) 
+  mutate(across(aqi_category, function(x) ifelse(x == "Unhealthy for Sensitive Groups", "Poco saludable para grupos sensibles", x))) |> 
+  mutate(across(aqi_category, function(x) ifelse(x == "Very Unhealthy", "Muy insalubre", x))) 
 
 datos_AQI
 ```
@@ -79,22 +80,100 @@ d. Obtenga el promedio del AQI Value por país, y cree 2 tablas: Una que muestre
 valores más bajos de AQI, y otra que muestre los 10 países con los valores más altos de AQI. Presente
 estas tablas con el paquete gt, añadiendo títulos y subtítulos (10pts)
 ```{r}
+prom_aqivalue <- datos_AQI |> 
+  group_by(country) |> 
+  summarise(Promedio = round(mean(aqi_value),digits = 2))
+```
+10 paises con promedio aqi más altos:
+```{r}
+aqivalue_altas <- prom_aqivalue|> 
+  arrange(desc(Promedio)) |> 
+  head(10)
+
+aqivalue_altasgt<- aqivalue_altas |> 
+  gt() |>
+  tab_header(
+    title = "Los 10 paises con los valores más altos de AQI",
+    subtitle = "Valores promedios de Aqi por país" 
+  ) |>
+  cols_label(
+    country = "Países")
+
+aqivalue_altasgt
 
 ```
+10 paises con promedio aqi más bajos:
+```{r}
+aqivalue_bajas <- prom_aqivalue|> 
+  arrange(Promedio) |> 
+  head(10)
 
-e. Para los 10 países con los valores promedios más altos de AQI, muestrelos en un mapa de leaflet usando
+aqivalue_bajasgt<- aqivalue_bajas |> 
+  gt() |>
+  tab_header(
+    title = "Los 10 paises con los valores más bajos de AQI",
+    subtitle = "Valores promedios de Aqi por país" 
+  ) |>
+  cols_label(
+    country = "Países")
+
+aqivalue_bajasgt
+```
+
+**
+e. Para los 10 ciudades con los valores promedios más altos de AQI, muestrelos en un mapa de leaflet usando
 addMarkers o un addCircles. En el popup debe colocar el valor promedio del AQI. (6pts)
 ```{r}
+ciudades_aqi<- datos_AQI |> 
+  select(country,city,lat,lng)
+  
+```
 
+```{r}
+join_prom_city<- left_join(prom_aqivalue, ciudades_aqi,
+                                   by = c("country"))
+
+ciudades_10_altas<- join_prom_city|> 
+  arrange(desc(Promedio)) |> 
+  head(10)
+
+glimpse(ciudades_10_altas)
+ciudades_10_altas<-ciudades_10_altas |> 
+   mutate(Promedio = as.character(Promedio)) #cambié a caracter porque no se reflejaba el promedio en el popup siendo dbl
+  
+
+```
+Mapa Leaflet:
+```{r}
+Mapa_10ciudades_prom_alto <-ciudades_10_altas |> 
+  leaflet() |> 
+  addTiles() |> 
+  addMarkers(lng = ~lng, lat = ~lat, popup = ~Promedio)
+
+Mapa_10ciudades_prom_alto
 ```
 
 f. Escriba el código que exporte los datos en un excel, de tal manera que cada pestaña tenga solamente
 los datos de una categoría de AQI. (Es decir una pestaña para las ciudades cuya categoría es “Good”
 o “Buena”, otra para los que la categoría es “Moderate” y así para cada cateoría). (5pts)
 ```{r}
-
+datos_aqi_excel<-list("Bueno" = Bueno<- datos_AQI |> 
+                        filter(aqi_category == "Bueno"),
+                      "Insalubre" =insalubre<- datos_AQI |> 
+                        filter(aqi_category == "Insalubre"),
+                      "Moderado" = Moderado<- datos_AQI |> 
+                        filter(aqi_category == "Moderado"),
+                      "Peligroso" = Peligroso<- datos_AQI |> 
+                        filter(aqi_category == "Peligroso"),
+                      "Poco saludable" =Poco_saludable<- datos_AQI |> 
+                        filter(aqi_category == "Poco saludable para grupos sensibles"),
+                      "Muy insalubre" = Muy_insalubre<-datos_AQI |> 
+                        filter(aqi_category == "Muy insalubre"))
 ```
 
+```{r}
+write_xlsx(datos_aqi_excel, path = "datos_practica/datos_aqi_excel.xlsx")
+```
 
 
 

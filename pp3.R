@@ -17,12 +17,37 @@ ui <- fluidPage(
                   width = "100%", 
                   
       ),
+      numericInput(inputId = "invitados", 
+                   label = "Número de invitados", 
+                   value =58, 
+                   min = 25, 
+                   max = 120, 
+      ),
+      selectInput(inputId = "selector_provincia", 
+                  label = "Provinvcia", 
+                  choices = c("Cartago", "Heredia","San José", "Limón","Puntarenas","Alajuela"),
+                  multiple = FALSE, 
+                  width = "100%", 
+      ),
     ),
-    mainPanel("Este es el panel principal")
+    mainPanel(
+      h3(strong("Vamos a planificar su día especial", style = "color:blue"),align = "center"),
+      tags$hr(style="border-color: lightblue;"),
+      h4(strong("Detalles del Evento:")),
+      br(),
+      textOutput("evento"),
+      textOutput("tema")
+      
+      
+    )
   )
 )
 
 server <- function(input, output, session) {
+  output$evento <- renderText(paste0("Nombre del evento ",input$nombre_evento
+  ))
+  output$tema <- renderText(paste0("Tema del evento:  ",input$tema_evento
+  ))
   
 }
 

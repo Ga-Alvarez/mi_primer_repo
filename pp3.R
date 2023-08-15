@@ -36,7 +36,10 @@ ui <- fluidPage(
       h4(strong("Detalles del Evento:")),
       br(),
       textOutput("evento"),
-      textOutput("tema")
+      br(),
+      textOutput("tema"),
+      br(),
+      textOutput("invitados_ubic")
       
       
     )
@@ -44,9 +47,11 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  output$evento <- renderText(paste0("Nombre del evento ",input$nombre_evento
+  output$evento <- renderText(paste0("Nombre del evento:  ",input$nombre_evento
   ))
   output$tema <- renderText(paste0("Tema del evento:  ",input$tema_evento
+  ))
+  output$invitados_ubic <- renderText(paste0("El evento  ",input$tema_evento, " tendrá ",input$invitados, "  y será llevado a cabo en ",input$selector_provincia
   ))
   
 }
